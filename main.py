@@ -1,6 +1,10 @@
-import pygame
 import pickle
+import pygame
+from pygame import mixer
 from os import path
+
+pygame.mixer.pre_init(44100, -16, 2, 512)
+mixer.init()
 
 # init pygame
 pygame.init()
@@ -37,6 +41,17 @@ bg_img = pygame.image.load('img/sky.png')
 restart_img = pygame.image.load('img/restart_btn.png')
 start_img = pygame.image.load('img/start_btn.png')
 exit_img = pygame.image.load('img/exit_btn.png')
+
+
+# load sounds
+pygame.mixer.music.load('sounds/music.wav')
+pygame.mixer.music.play(-1, 0.0, 5000)
+coin_fx = pygame.mixer.Sound('sounds/coin.wav')
+coin_fx.set_volume(0.5)     # 50% of the volume
+jump_fx = pygame.mixer.Sound('sounds/jump.wav')
+jump_fx.set_volume(0.5)
+game_over_fx = pygame.mixer.Sound('sounds/game_over.wav')
+game_over_fx.set_volume(0.5)
 
 
 def draw_text(text, font, text_color, x, y):
@@ -105,6 +120,7 @@ class Player:
             # get keypress
             key = pygame.key.get_pressed()
             if key[pygame.K_SPACE] and not self.jumped and not self.ir_air:
+                jump_fx.play()
                 self.vel_y -= 15
                 self.jumped = True
             if key[pygame.K_SPACE]:
@@ -163,10 +179,12 @@ class Player:
             # check for collition with enemies
             if pygame.sprite.spritecollide(self, blob_group, False):
                 game_over = -1
+                game_over_fx.play()
 
             # check for collition with lava
             if pygame.sprite.spritecollide(self, lava_group, False):
                 game_over = -1
+                game_over_fx.play()
 
             # check for collition with exit door
             if pygame.sprite.spritecollide(self, exit_group, False):
@@ -363,7 +381,8 @@ while run:
             # check if coin has been collected
             if pygame.sprite.spritecollide(player, coin_group, True):
                 score += 1
-            draw_text(f'X {score}', font_score, white, tile_size - 10, 10)
+                coin_fx.play()
+            draw_text(f'X {score}', font_score, white, tile_size - 5, 15)
 
         blob_group.draw(screen)
         lava_group.draw(screen)
