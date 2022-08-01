@@ -172,7 +172,6 @@ class Player:
             if pygame.sprite.spritecollide(self, exit_group, False):
                 game_over = 1
 
-
             # update player coordinates
             self.rect.x += dx
             self.rect.y += dy
